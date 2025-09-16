@@ -40,7 +40,7 @@ export default function EditTranscriptClient({ meetingId, initial }: { meetingId
 	return (
 		<div className="space-y-2">
 			<textarea
-				className="w-full border rounded p-3 min-h-[160px] bg-half-white"
+				className="w-full border rounded p-3 min-h-[160px] bg-half-white text-gray-900"
 				value={text}
 				onChange={(e) => setText(e.target.value)}
 				placeholder="Edit transcript..."

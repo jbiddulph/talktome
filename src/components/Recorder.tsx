@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from 'react';
 import { MicrophoneIcon, StopCircleIcon } from '@heroicons/react/24/solid';
+import { VoiceRecorder } from 'capacitor-voice-recorder';
 
 type Props = { meetingId: string };
 
@@ -13,13 +14,7 @@ export default function Recorder({ meetingId }: Props) {
   const [elapsedSec, setElapsedSec] = useState<number>(0);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const rafRef = useRef<number | null>(null);
-  const pcmChunksRef = useRef<Uint8Array[] | null>(null);
-  const aiListenerRef = useRef<EventListener | null>(null);
-  const aiErrorListenerRef = useRef<EventListener | null>(null);
-  const aiChunkGuardRef = useRef<number | null>(null);
-  const nativeSampleRateRef = useRef<number>(16000);
-  const audioCtxRef = useRef<AudioContext | null>(null);
-  const scriptNodeRef = useRef<ScriptProcessorNode | null>(null);
+  // Native path does not need extra buffers when using VoiceRecorder
   const timerRef = useRef<number | null>(null);
 
   function startTimer() {
@@ -47,7 +42,35 @@ export default function Recorder({ meetingId }: Props) {
     return `${hh}:${mm}:${ss}`;
   }
 
-  // Note: helper functions removed as unused to satisfy lint rules
+  // Helpers for native m4a base64 payloads
+  function base64ToBlob(base64Data: string, contentType = 'audio/m4a'): Blob {
+    let b64 = base64Data.trim();
+    const commaIdx = b64.indexOf(',');
+    if (commaIdx !== -1 && b64.substring(0, commaIdx).includes('base64')) b64 = b64.substring(commaIdx + 1);
+    b64 = b64.replace(/\s+/g, '').replace(/-/g, '+').replace(/_/g, '/');
+    const pad = b64.length % 4;
+    if (pad) b64 += '='.repeat(4 - pad);
+    const byteCharacters = atob(b64);
+    const byteArrays: Uint8Array[] = [];
+    const sliceSize = 1024;
+    for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+      const slice = byteCharacters.slice(offset, offset + sliceSize);
+      const byteNumbers = new Array(slice.length);
+      for (let i = 0; i < slice.length; i++) byteNumbers[i] = slice.charCodeAt(i);
+      byteArrays.push(new Uint8Array(byteNumbers));
+    }
+    return new Blob(byteArrays, { type: contentType });
+  }
+
+  function pickFilenameAndType(mime: string | undefined): { filename: string; type: string } {
+    const m = (mime || '').toLowerCase();
+    if (m.includes('mp3')) return { filename: 'audio.mp3', type: 'audio/mp3' };
+    if (m.includes('wav')) return { filename: 'audio.wav', type: 'audio/wav' };
+    if (m.includes('ogg') || m.includes('oga')) return { filename: 'audio.ogg', type: 'audio/ogg' };
+    if (m.includes('webm')) return { filename: 'audio.webm', type: 'audio/webm' };
+    if (m.includes('mp4') || m.includes('m4a') || m.includes('aac')) return { filename: 'audio.m4a', type: 'audio/m4a' };
+    return { filename: 'audio.m4a', type: 'audio/m4a' };
+  }
 
   useEffect(() => {
     return () => {
@@ -112,97 +135,17 @@ export default function Recorder({ meetingId }: Props) {
       return;
     }
 
-    // Native WAV fallback via cordova-plugin-audioinput
-    const ai = (typeof window !== 'undefined' ? (window as Window & typeof globalThis).audioinput : undefined) as Window['audioinput'] | undefined;
-    if (ai) {
-      setStatus('Requesting microphone permission...');
-      // Ensure listeners from prior sessions are removed
-      if (aiListenerRef.current) document.removeEventListener('audioinput', aiListenerRef.current, false);
-      if (aiErrorListenerRef.current) document.removeEventListener('audioinputerror', aiErrorListenerRef.current, false);
-      aiListenerRef.current = null;
-      aiErrorListenerRef.current = null;
-
-      // Some devices need check+request flow
-      ai.checkMicrophonePermissions((hasPerm: boolean) => {
-        const request = () => ai.getMicrophonePermission((granted: boolean) => begin(granted));
-        if (!hasPerm) request(); else begin(true);
-      });
-
-      const begin = (granted: boolean) => {
-        if (!granted) {
-          setStatus('Microphone permission not granted');
-          return;
-        }
-        pcmChunksRef.current = [];
-        // Use WebAudio streaming from plugin to reliably capture samples
-        try {
-          const win = window as Window & typeof globalThis & { webkitAudioContext?: typeof AudioContext };
-          const Ctx: typeof AudioContext | undefined = win.AudioContext || win.webkitAudioContext;
-          if (!Ctx) throw new Error('No AudioContext');
-          const audioCtx = new Ctx();
-          audioCtxRef.current = audioCtx;
-          nativeSampleRateRef.current = Math.floor(audioCtx.sampleRate) || 44100;
-          const bufferSize = 2048; // small buffers to ensure frequent callbacks
-          const script = audioCtx.createScriptProcessor(bufferSize, 1, 1);
-          script.onaudioprocess = (e) => {
-            const input = e.inputBuffer.getChannelData(0); // Float32 [-1,1]
-            // Convert float32 to 16-bit PCM little-endian
-            const out = new Uint8Array(input.length * 2);
-            let o = 0;
-            for (let i = 0; i < input.length; i++) {
-              let s = Math.max(-1, Math.min(1, input[i]));
-              s = s < 0 ? s * 0x8000 : s * 0x7fff;
-              const v = s | 0;
-              out[o++] = v & 0xff;
-              out[o++] = (v >> 8) & 0xff;
-            }
-            if (out.length) {
-              pcmChunksRef.current!.push(out);
-              if (pcmChunksRef.current!.length === 1) setStatus('Recording… capturing audio');
-            }
-          };
-          script.connect(audioCtx.destination);
-          scriptNodeRef.current = script;
-
-          // Connect plugin source to script processor
-          ai.connect(script);
-
-          const config: {
-            sampleRate: number;
-            channels: number;
-            format?: number;
-            bufferSize?: number;
-            streamToWebAudio?: boolean;
-            normalize?: boolean;
-            audioSourceType?: number;
-          } = {
-            sampleRate: nativeSampleRateRef.current,
-            channels: 1,
-            format: ai.FORMAT?.PCM_16BIT ?? 1,
-            bufferSize: 4096,
-            streamToWebAudio: true,
-            normalize: false,
-            audioSourceType: ai.AUDIO_SOURCE_TYPE?.DEFAULT ?? 0,
-          };
-          ai.start(config);
-        } catch {
-          setStatus('Recording error');
-          return;
-        }
-        setRecording(true);
-        setStatus('Recording...');
-        startTimer();
-        // Guard: if no chunks after 2s, inform user
-        if (aiChunkGuardRef.current) clearTimeout(aiChunkGuardRef.current);
-        aiChunkGuardRef.current = window.setTimeout(() => {
-          if (pcmChunksRef.current && pcmChunksRef.current.length === 0) {
-            setStatus('No audio captured yet… try speaking or adjust mic perms');
-          }
-        }, 2000);
-      };
+    // Native path via capacitor-voice-recorder (m4a base64)
+    setStatus('Requesting microphone permission...');
+    const perm = await VoiceRecorder.requestAudioRecordingPermission();
+    if (!perm.value) {
+      setStatus('Microphone permission not granted');
       return;
     }
-    setStatus('Recording not supported in this environment');
+    await VoiceRecorder.startRecording();
+    setRecording(true);
+    setStatus('Recording...');
+    startTimer();
   }
 
   async function stop() {
@@ -216,72 +159,30 @@ export default function Recorder({ meetingId }: Props) {
       return;
     }
 
-    // Native WAV stop via cordova-plugin-audioinput
-    const ai = (typeof window !== 'undefined' ? (window as Window & typeof globalThis).audioinput : undefined) as Window['audioinput'] | undefined;
-    if (ai?.isCapturing()) {
-      try {
-        ai.stop();
-        // Clean up listeners
-        if (aiListenerRef.current) document.removeEventListener('audioinput', aiListenerRef.current, false);
-        if (aiErrorListenerRef.current) document.removeEventListener('audioinputerror', aiErrorListenerRef.current, false);
-        aiListenerRef.current = null;
-        aiErrorListenerRef.current = null;
-        if (aiChunkGuardRef.current) { clearTimeout(aiChunkGuardRef.current); aiChunkGuardRef.current = null; }
-        // Disconnect WebAudio nodes
-        try {
-          scriptNodeRef.current?.disconnect();
-          audioCtxRef.current?.close();
-        } catch {}
-        scriptNodeRef.current = null;
-        audioCtxRef.current = null;
-        stopTimer();
-        const chunks = pcmChunksRef.current || [];
-        const total = chunks.reduce((n, c) => n + c.length, 0);
-        if (!total) {
-          setStatus('Transcription failed: empty audio');
-          setRecording(false);
-          return;
-        }
-        const pcm = new Uint8Array(total);
-        let offset = 0;
-        for (const c of chunks) { pcm.set(c, offset); offset += c.length; }
-
-        // WAV header (mono, 16-bit) at recorded sample rate
-        const sampleRate = nativeSampleRateRef.current || 16000, channels = 1, bitsPerSample = 16;
-        const blockAlign = (channels * bitsPerSample) / 8;
-        const byteRate = sampleRate * blockAlign;
-        const dataSize = pcm.length;
-        const wav = new ArrayBuffer(44 + dataSize);
-        const view = new DataView(wav);
-        const writeStr = (o: number, s: string) => { for (let i = 0; i < s.length; i++) view.setUint8(o + i, s.charCodeAt(i)); };
-        writeStr(0, 'RIFF'); view.setUint32(4, 36 + dataSize, true); writeStr(8, 'WAVE');
-        writeStr(12, 'fmt '); view.setUint32(16, 16, true); view.setUint16(20, 1, true);
-        view.setUint16(22, channels, true); view.setUint32(24, sampleRate, true);
-        view.setUint32(28, byteRate, true); view.setUint16(32, blockAlign, true);
-        view.setUint16(34, bitsPerSample, true);
-        writeStr(36, 'data'); view.setUint32(40, dataSize, true);
-        new Uint8Array(wav, 44).set(pcm);
-
-        const blob = new Blob([wav], { type: 'audio/wav' });
-        const fd = new FormData();
-        fd.append('file', blob, 'audio.wav');
-        fd.append('meetingId', meetingId);
-        setStatus('Uploading and transcribing...');
-        const res = await fetch('/api/transcribe', { method: 'POST', body: fd, cache: 'no-store' });
-        if (!res.ok) {
-          const err = await res.text().catch(() => '');
-          setStatus('Transcription failed' + (err ? `: ${err.slice(0, 120)}` : ''));
-        } else {
-          setStatus('Transcribed');
-          window.location.reload();
-        }
-      } catch {
-        setStatus('Recording failed');
-      } finally {
-        setRecording(false);
-        pcmChunksRef.current = null;
+    // Native stop via VoiceRecorder (m4a base64)
+    try {
+      const result = await VoiceRecorder.stopRecording();
+      stopTimer();
+      const base64 = result.value.recordDataBase64 ?? '';
+      const mime = result.value.mimeType || 'audio/m4a';
+      const chosen = pickFilenameAndType(mime);
+      const blob = base64ToBlob(base64, chosen.type);
+      const fd = new FormData();
+      fd.append('file', blob, chosen.filename);
+      fd.append('meetingId', meetingId);
+      setStatus('Uploading and transcribing...');
+      const res = await fetch('/api/transcribe', { method: 'POST', body: fd, cache: 'no-store' });
+      if (!res.ok) {
+        const err = await res.text().catch(() => '');
+        setStatus('Transcription failed' + (err ? `: ${err.slice(0, 120)}` : ''));
+      } else {
+        setStatus('Transcribed');
+        window.location.reload();
       }
-      return;
+    } catch {
+      setStatus('Recording failed');
+    } finally {
+      setRecording(false);
     }
   }
 
