@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 export default function EditTranscriptClient({ meetingId, initial }: { meetingId: string; initial: string }) {
 	const [text, setText] = useState<string>(initial ?? "");
 	const [saving, setSaving] = useState(false);
+	// Keep history fetched to record server-side change tracking, not rendered currently
 	const [edits, setEdits] = useState<Array<{ id: string; fromText: string; toText: string; createdAt: string }>>([]);
 	const [dirty, setDirty] = useState(false);
 

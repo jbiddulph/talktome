@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
 
   // Inspect incoming file
   const size = (file as Blob).size;
-  const type = (file as any)?.type ?? '';
+  const type = (file as Blob).type ?? '';
   if (!size || size < 200) {
     console.error('Transcribe: empty or tiny file received. type=', type, 'size=', size);
     return new Response('empty audio received', { status: 400 });

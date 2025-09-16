@@ -14,8 +14,8 @@ export default function Recorder({ meetingId }: Props) {
   const analyserRef = useRef<AnalyserNode | null>(null);
   const rafRef = useRef<number | null>(null);
   const pcmChunksRef = useRef<Uint8Array[] | null>(null);
-  const aiListenerRef = useRef<((e: any) => void) | null>(null);
-  const aiErrorListenerRef = useRef<((e: any) => void) | null>(null);
+  const aiListenerRef = useRef<EventListener | null>(null);
+  const aiErrorListenerRef = useRef<EventListener | null>(null);
   const aiChunkGuardRef = useRef<number | null>(null);
   const nativeSampleRateRef = useRef<number>(16000);
   const audioCtxRef = useRef<AudioContext | null>(null);
@@ -47,38 +47,7 @@ export default function Recorder({ meetingId }: Props) {
     return `${hh}:${mm}:${ss}`;
   }
 
-  function base64ToBlob(base64Data: string, contentType = 'audio/m4a'): Blob {
-    // Normalize: strip data URL prefix, fix URL-safe chars, strip whitespace
-    let b64 = base64Data.trim();
-    const commaIdx = b64.indexOf(',');
-    if (commaIdx !== -1 && b64.substring(0, commaIdx).includes('base64')) b64 = b64.substring(commaIdx + 1);
-    b64 = b64.replace(/\s+/g, '').replace(/-/g, '+').replace(/_/g, '/');
-    // pad to multiple of 4
-    const pad = b64.length % 4;
-    if (pad) b64 += '='.repeat(4 - pad);
-    const byteCharacters = atob(b64);
-    const byteArrays: Uint8Array[] = [];
-    const sliceSize = 1024;
-    for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
-      const slice = byteCharacters.slice(offset, offset + sliceSize);
-      const byteNumbers = new Array(slice.length);
-      for (let i = 0; i < slice.length; i++) byteNumbers[i] = slice.charCodeAt(i);
-      byteArrays.push(new Uint8Array(byteNumbers));
-    }
-    return new Blob(byteArrays, { type: contentType });
-  }
-
-  function pickFilenameAndType(mime: string | undefined): { filename: string; type: string } {
-    const m = (mime || '').toLowerCase();
-    if (m.includes('mp3')) return { filename: 'audio.mp3', type: 'audio/mp3' };
-    if (m.includes('wav')) return { filename: 'audio.wav', type: 'audio/wav' };
-    if (m.includes('ogg') || m.includes('oga')) return { filename: 'audio.ogg', type: 'audio/ogg' };
-    if (m.includes('webm')) return { filename: 'audio.webm', type: 'audio/webm' };
-    // iOS often returns 'audio/mp4' or 'audio/aac' for m4a
-    if (m.includes('mp4') || m.includes('m4a') || m.includes('aac')) return { filename: 'audio.m4a', type: 'audio/m4a' };
-    // default to m4a which Whisper supports
-    return { filename: 'audio.m4a', type: 'audio/m4a' };
-  }
+  // Note: helper functions removed as unused to satisfy lint rules
 
   useEffect(() => {
     return () => {
@@ -144,17 +113,17 @@ export default function Recorder({ meetingId }: Props) {
     }
 
     // Native WAV fallback via cordova-plugin-audioinput
-    const ai = (typeof window !== 'undefined' ? (window as any).audioinput : undefined) as Window['audioinput'] | undefined;
+    const ai = (typeof window !== 'undefined' ? (window as Window & typeof globalThis).audioinput : undefined) as Window['audioinput'] | undefined;
     if (ai) {
       setStatus('Requesting microphone permission...');
       // Ensure listeners from prior sessions are removed
-      if (aiListenerRef.current) document.removeEventListener('audioinput', aiListenerRef.current as any, false);
-      if (aiErrorListenerRef.current) document.removeEventListener('audioinputerror', aiErrorListenerRef.current as any, false);
+      if (aiListenerRef.current) document.removeEventListener('audioinput', aiListenerRef.current, false);
+      if (aiErrorListenerRef.current) document.removeEventListener('audioinputerror', aiErrorListenerRef.current, false);
       aiListenerRef.current = null;
       aiErrorListenerRef.current = null;
 
       // Some devices need check+request flow
-      ai.checkMicrophonePermission((hasPerm: boolean) => {
+      ai.checkMicrophonePermissions((hasPerm: boolean) => {
         const request = () => ai.getMicrophonePermission((granted: boolean) => begin(granted));
         if (!hasPerm) request(); else begin(true);
       });
@@ -196,16 +165,24 @@ export default function Recorder({ meetingId }: Props) {
           scriptNodeRef.current = script;
 
           // Connect plugin source to script processor
-          (ai as any).connect(script);
+          ai.connect(script);
 
-          const config: any = {
+          const config: {
+            sampleRate: number;
+            channels: number;
+            format?: number;
+            bufferSize?: number;
+            streamToWebAudio?: boolean;
+            normalize?: boolean;
+            audioSourceType?: number;
+          } = {
             sampleRate: nativeSampleRateRef.current,
             channels: 1,
-            format: (ai as any).FORMAT?.PCM_16BIT ?? 1,
+            format: ai.FORMAT?.PCM_16BIT ?? 1,
             bufferSize: 4096,
             streamToWebAudio: true,
             normalize: false,
-            audioSourceType: (ai as any).AUDIO_SOURCE_TYPE?.DEFAULT ?? 0,
+            audioSourceType: ai.AUDIO_SOURCE_TYPE?.DEFAULT ?? 0,
           };
           ai.start(config);
         } catch {
@@ -240,13 +217,13 @@ export default function Recorder({ meetingId }: Props) {
     }
 
     // Native WAV stop via cordova-plugin-audioinput
-    const ai = (typeof window !== 'undefined' ? (window as any).audioinput : undefined) as Window['audioinput'] | undefined;
+    const ai = (typeof window !== 'undefined' ? (window as Window & typeof globalThis).audioinput : undefined) as Window['audioinput'] | undefined;
     if (ai?.isCapturing()) {
       try {
         ai.stop();
         // Clean up listeners
-        if (aiListenerRef.current) document.removeEventListener('audioinput', aiListenerRef.current as any, false);
-        if (aiErrorListenerRef.current) document.removeEventListener('audioinputerror', aiErrorListenerRef.current as any, false);
+        if (aiListenerRef.current) document.removeEventListener('audioinput', aiListenerRef.current, false);
+        if (aiErrorListenerRef.current) document.removeEventListener('audioinputerror', aiErrorListenerRef.current, false);
         aiListenerRef.current = null;
         aiErrorListenerRef.current = null;
         if (aiChunkGuardRef.current) { clearTimeout(aiChunkGuardRef.current); aiChunkGuardRef.current = null; }

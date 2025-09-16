@@ -1,14 +1,12 @@
 import { prisma } from '@/lib/prisma';
 import RecorderClient from './RecorderClient';
-import AddToCalendar from './calendar';
 import { summarizeTranscript } from '@/lib/openai';
 import { revalidatePath } from 'next/cache';
 import SubmitButton from '@/components/SubmitButton';
 import ConfirmButton from '@/components/ConfirmButton';
 import TranslateClient from './TranslateClient';
 import ShareActions from './ShareActions';
-import Link from 'next/link';
-import { ArrowLeftIcon } from '@heroicons/react/24/outline';
+// import Link from 'next/link';
 import ClientTime from '@/components/ClientTime';
 import CopyableBlock from '@/components/CopyableBlock';
 import EditTranscriptClient from './EditTranscriptClient';
