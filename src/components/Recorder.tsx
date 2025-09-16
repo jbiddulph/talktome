@@ -59,7 +59,15 @@ export default function Recorder({ meetingId }: Props) {
       for (let i = 0; i < slice.length; i++) byteNumbers[i] = slice.charCodeAt(i);
       byteArrays.push(new Uint8Array(byteNumbers));
     }
-    return new Blob(byteArrays, { type: contentType });
+    // Concatenate into a single ArrayBuffer to satisfy strict BlobPart typing
+    const total = byteArrays.reduce((n, u8) => n + u8.byteLength, 0);
+    const merged = new Uint8Array(total);
+    let offset = 0;
+    for (const u8 of byteArrays) {
+      merged.set(u8, offset);
+      offset += u8.byteLength;
+    }
+    return new Blob([merged.buffer], { type: contentType });
   }
 
   function pickFilenameAndType(mime: string | undefined): { filename: string; type: string } {
