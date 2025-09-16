@@ -1,103 +1,162 @@
-import Image from "next/image";
+import Link from 'next/link';
+import { prisma } from '@/lib/prisma';
+import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
+import { PlusIcon, FolderIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
+import ClientTime from '@/components/ClientTime';
+import ConfirmButton from '@/components/ConfirmButton';
 
-export default function Home() {
+export default async function Home() {
+  const [folders, meetings] = await Promise.all([
+    prisma.folder.findMany({ orderBy: { createdAt: 'desc' } }),
+    prisma.meeting.findMany({ orderBy: { createdAt: 'desc' } }),
+  ]);
+
+  async function createFolder(formData: FormData) {
+    'use server';
+    const name = String(formData.get('name') ?? '').trim();
+    if (!name) return;
+    await prisma.folder.create({ data: { name } });
+    revalidatePath('/');
+    redirect('/');
+  }
+
+  async function createMeeting(formData: FormData) {
+    'use server';
+    const title = String(formData.get('title') ?? 'Untitled Meeting');
+    const folderId = String(formData.get('folderId') ?? '');
+    await prisma.meeting.create({ data: { title, folderId: folderId || null } });
+    revalidatePath('/');
+    redirect('/');
+  }
+
+  async function updateFolder(formData: FormData) {
+    'use server';
+    const id = String(formData.get('id') ?? '');
+    const name = String(formData.get('name') ?? '').trim();
+    if (!id || !name) return;
+    await prisma.folder.update({ where: { id }, data: { name } });
+    revalidatePath('/');
+    redirect('/');
+  }
+
+  async function deleteFolder(formData: FormData) {
+    'use server';
+    const id = String(formData.get('id') ?? '');
+    if (!id) return;
+    await prisma.folder.delete({ where: { id } });
+    revalidatePath('/');
+    redirect('/');
+  }
+
+  async function updateMeeting(formData: FormData) {
+    'use server';
+    const id = String(formData.get('id') ?? '');
+    const title = String(formData.get('title') ?? '').trim();
+    const folderId = String(formData.get('folderId') ?? '');
+    if (!id || !title) return;
+    await prisma.meeting.update({ where: { id }, data: { title, folderId: folderId || null } });
+    revalidatePath('/');
+    redirect('/');
+  }
+
+  async function deleteMeeting(formData: FormData) {
+    'use server';
+    const id = String(formData.get('id') ?? '');
+    if (!id) return;
+    await prisma.meeting.delete({ where: { id } });
+    revalidatePath('/');
+    redirect('/');
+  }
+
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <main className="container space-y-6">
+      <div className="glass p-5">
+        <h1 className="text-2xl font-semibold flex items-center gap-2">
+          <FolderIcon className="h-6 w-6 text-blue-600" /> TalkToMe
+        </h1>
+        <p className="opacity-90">Capture, transcribe, and summarize meetings.</p>
+      </div>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+      <section className="space-y-2 glass p-4" style={{ borderRadius: 12 }}>
+        <h2 className="text-xl font-medium">Folders</h2>
+        <form action={createFolder} className="flex gap-2">
+          <input name="name" placeholder="New folder name" className="border rounded px-3 py-3 flex-1" />
+          <button className="btn-primary inline-flex items-center gap-1 tap-target">
+            <PlusIcon className="h-5 w-5" /> Add
+          </button>
+        </form>
+        <ul className="divide-y border rounded">
+          {folders.map((f) => (
+            <li key={f.id} className="p-3 flex items-center justify-between gap-3">
+              <span className="font-medium">{f.name}</span>
+              <div className="flex items-center gap-2">
+                <details>
+                  <summary className="cursor-pointer text-sm text-gray-700 inline-flex items-center gap-1">
+                    <PencilIcon className="h-4 w-4" /> Edit
+                  </summary>
+                  <form action={updateFolder} className="mt-2 flex gap-2">
+                    <input type="hidden" name="id" value={f.id} />
+                    <input name="name" defaultValue={f.name} className="border rounded px-2 py-1" />
+                    <button className="btn-ghost">Save</button>
+                  </form>
+                </details>
+                <form action={deleteFolder}>
+                  <input type="hidden" name="id" value={f.id} />
+                  <ConfirmButton confirmText="Delete this folder and all meetings?" className="text-red-700 inline-flex items-center gap-1"><TrashIcon className="h-4 w-4" /> Delete</ConfirmButton>
+                </form>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section className="space-y-2 glass p-4" style={{ borderRadius: 12 }}>
+        <h2 className="text-xl font-medium">Meetings</h2>
+        <form action={createMeeting} className="flex gap-2">
+          <input name="title" placeholder="New meeting title" className="border rounded px-3 py-3 flex-1" />
+          <select name="folderId" className="border rounded px-3 py-3">
+            <option value="">No folder</option>
+            {folders.map((f) => (
+              <option key={f.id} value={f.id}>{f.name}</option>
+            ))}
+          </select>
+          <button className="btn-primary inline-flex items-center gap-1 tap-target"><PlusIcon className="h-5 w-5" /> Create</button>
+        </form>
+        <ul className="divide-y border rounded">
+          {meetings.map((m) => (
+            <li key={m.id} className="p-3 space-y-2">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-medium">{m.title}</p>
+                  <p className="text-sm text-gray-500"><ClientTime iso={m.createdAt as unknown as string} /></p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Link className="text-blue-600" href={`/meetings/${m.id}`}>Open</Link>
+                  <details>
+                    <summary className="cursor-pointer text-sm text-gray-700 inline-flex items-center gap-1"><PencilIcon className="h-4 w-4" /> Edit</summary>
+                    <form action={updateMeeting} className="mt-2 flex flex-wrap gap-2 items-center">
+                      <input type="hidden" name="id" value={m.id} />
+                      <input name="title" defaultValue={m.title} className="border rounded px-2 py-1" />
+                      <select name="folderId" defaultValue={m.folderId ?? ''} className="border rounded px-2 py-1">
+                        <option value="">No folder</option>
+                        {folders.map((f) => (
+                          <option key={f.id} value={f.id}>{f.name}</option>
+                        ))}
+                      </select>
+                      <button className="btn-ghost">Save</button>
+                    </form>
+                  </details>
+                  <form action={deleteMeeting}>
+                    <input type="hidden" name="id" value={m.id} />
+                    <ConfirmButton confirmText="Delete this meeting?" className="text-red-700 inline-flex items-center gap-1"><TrashIcon className="h-4 w-4" /> Delete</ConfirmButton>
+                  </form>
+                </div>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </section>
+    </main>
   );
 }

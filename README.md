@@ -1,36 +1,49 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# TalkToMe
 
-## Getting Started
+AI meeting note taker using Next.js + Capacitor (iOS), Prisma (SQLite), and OpenAI.
 
-First, run the development server:
+## Setup
+
+1. Install Node 20+ and Xcode (for iOS).
+2. Install deps:
+
+```bash
+npm install
+```
+
+3. Create `.env`:
+
+```env
+DATABASE_URL="file:./dev.db"
+OPENAI_API_KEY=sk-...
+NEXT_PUBLIC_BASE_URL=http://localhost:3000
+```
+
+4. Prisma:
+
+```bash
+npx prisma migrate dev
+npx prisma generate
+```
+
+## Dev
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- Home page lets you create folders and meetings.
+- Meeting page lets you record audio, transcribe (Whisper), and generate AI summary.
+- Add to calendar downloads an ICS file for the meeting.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Build + Capacitor iOS
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Next.js static export and sync to iOS:
 
-## Learn More
+```bash
+npm run build && npm run export
+npx cap sync ios
+npx cap open ios
+```
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+In Xcode, set signing, then run on device/simulator.

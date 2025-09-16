@@ -20,7 +20,54 @@
 }
 
 body {
-  background: var(--background);
+  background: linear-gradient(135deg, #f0abfc 0%, #38bdf8 50%, #34d399 100%);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  min-height: 100vh;
+}
+
+.glass {
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.btn-primary {
+  background: linear-gradient(90deg, #6366f1, #8b5cf6);
+  color: white;
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-weight: 600;
+}
+
+.btn-ghost {
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 10px;
+  padding: 10px 14px;
+}
+
+.bg-half-white {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+/* Mobile-friendly layout helpers */
+.container {
+  width: 100%;
+  max-width: 640px; /* iPhone-friendly max */
+  margin: 0 auto;
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-bottom: calc(env(safe-area-inset-bottom) + 16px);
+}
+
+.safe-header {
+  padding-top: calc(env(safe-area-inset-top) + 8px);
+}
+
+.tap-target {
+  min-height: 44px;
+  min-width: 44px;
 }

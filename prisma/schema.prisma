@@ -1,0 +1,81 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Folder {
+  id         String    @id @default(cuid())
+  name       String
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  meetings   Meeting[]
+}
+
+model Meeting {
+  id             String    @id @default(cuid())
+  title          String
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  scheduledAt    DateTime?
+  durationSec    Int?
+  audioUrl       String?
+  transcript     String?
+  summary        String?
+  wordsPerMinute Int?
+  speakers       Int?
+  folder         Folder?   @relation(fields: [folderId], references: [id])
+  folderId       String?
+  chunks         TranscriptChunk[]
+  edits          TranscriptEdit[]
+  bookmarks      Bookmark[]
+  importJobs     ImportJob[]
+}
+
+model TranscriptChunk {
+  id         String   @id @default(cuid())
+  meeting    Meeting  @relation(fields: [meetingId], references: [id])
+  meetingId  String
+  startMs    Int
+  endMs      Int
+  text       String
+  speaker    String? // simple label for now
+  createdAt  DateTime @default(now())
+}
+
+model TranscriptEdit {
+  id         String   @id @default(cuid())
+  meeting    Meeting  @relation(fields: [meetingId], references: [id])
+  meetingId  String
+  fromText   String
+  toText     String
+  createdAt  DateTime @default(now())
+}
+
+model Bookmark {
+  id         String   @id @default(cuid())
+  meeting    Meeting  @relation(fields: [meetingId], references: [id])
+  meetingId  String
+  label      String
+  timeMs     Int
+  createdAt  DateTime @default(now())
+}
+
+model ImportJob {
+  id         String   @id @default(cuid())
+  meeting    Meeting? @relation(fields: [meetingId], references: [id])
+  meetingId  String?
+  fileName   String
+  fileUrl    String
+  status     String   @default("queued") // queued|processing|done|error
+  error      String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
