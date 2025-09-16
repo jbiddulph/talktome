@@ -14,9 +14,16 @@ CREATE TABLE IF NOT EXISTS "public"."talktome_folders" (
 CREATE TABLE IF NOT EXISTS "public"."talktome_meetings" (
     "id" TEXT NOT NULL,
     "title" TEXT NOT NULL,
-    "folderId" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "scheduledAt" TIMESTAMP(3),
+    "durationSec" INTEGER,
+    "audioUrl" TEXT,
+    "transcript" TEXT,
+    "summary" TEXT,
+    "wordsPerMinute" INTEGER,
+    "speakers" INTEGER,
+    "folderId" TEXT,
     CONSTRAINT "talktome_meetings_pkey" PRIMARY KEY ("id")
 );
 
@@ -24,9 +31,10 @@ CREATE TABLE IF NOT EXISTS "public"."talktome_meetings" (
 CREATE TABLE IF NOT EXISTS "public"."talktome_transcript_chunks" (
     "id" TEXT NOT NULL,
     "meetingId" TEXT NOT NULL,
+    "startMs" INTEGER NOT NULL,
+    "endMs" INTEGER NOT NULL,
     "text" TEXT NOT NULL,
-    "startTime" DOUBLE PRECISION NOT NULL,
-    "endTime" DOUBLE PRECISION NOT NULL,
+    "speaker" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "talktome_transcript_chunks_pkey" PRIMARY KEY ("id")
 );
@@ -35,8 +43,8 @@ CREATE TABLE IF NOT EXISTS "public"."talktome_transcript_chunks" (
 CREATE TABLE IF NOT EXISTS "public"."talktome_transcript_edits" (
     "id" TEXT NOT NULL,
     "meetingId" TEXT NOT NULL,
-    "originalText" TEXT NOT NULL,
-    "editedText" TEXT NOT NULL,
+    "fromText" TEXT NOT NULL,
+    "toText" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "talktome_transcript_edits_pkey" PRIMARY KEY ("id")
 );
@@ -45,8 +53,8 @@ CREATE TABLE IF NOT EXISTS "public"."talktome_transcript_edits" (
 CREATE TABLE IF NOT EXISTS "public"."talktome_bookmarks" (
     "id" TEXT NOT NULL,
     "meetingId" TEXT NOT NULL,
-    "title" TEXT NOT NULL,
-    "timestamp" DOUBLE PRECISION NOT NULL,
+    "label" TEXT NOT NULL,
+    "timeMs" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "talktome_bookmarks_pkey" PRIMARY KEY ("id")
 );
@@ -54,10 +62,11 @@ CREATE TABLE IF NOT EXISTS "public"."talktome_bookmarks" (
 -- Create talktome_import_jobs table
 CREATE TABLE IF NOT EXISTS "public"."talktome_import_jobs" (
     "id" TEXT NOT NULL,
-    "meetingId" TEXT NOT NULL,
-    "status" TEXT NOT NULL DEFAULT 'pending',
-    "filePath" TEXT,
-    "errorMessage" TEXT,
+    "meetingId" TEXT,
+    "fileName" TEXT NOT NULL,
+    "fileUrl" TEXT NOT NULL,
+    "status" TEXT NOT NULL DEFAULT 'queued',
+    "error" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     CONSTRAINT "talktome_import_jobs_pkey" PRIMARY KEY ("id")
