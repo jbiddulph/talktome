@@ -8,7 +8,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  schemas  = ["safehouse", "auth"]
+  schemas  = ["public", "auth"]
 }
 
 model Folder {
@@ -18,7 +18,7 @@ model Folder {
   updatedAt  DateTime  @updatedAt
   meetings   Meeting[]
   @@map("talktome_folders")
-  @@schema("safehouse")
+  @@schema("public")
 }
 
 model Meeting {
@@ -40,7 +40,7 @@ model Meeting {
   bookmarks      Bookmark[]
   importJobs     ImportJob[]
   @@map("talktome_meetings")
-  @@schema("safehouse")
+  @@schema("public")
 }
 
 model TranscriptChunk {
@@ -53,7 +53,7 @@ model TranscriptChunk {
   speaker    String? // simple label for now
   createdAt  DateTime @default(now())
   @@map("talktome_transcript_chunks")
-  @@schema("safehouse")
+  @@schema("public")
 }
 
 model TranscriptEdit {
@@ -64,7 +64,7 @@ model TranscriptEdit {
   toText     String
   createdAt  DateTime @default(now())
   @@map("talktome_transcript_edits")
-  @@schema("safehouse")
+  @@schema("public")
 }
 
 model Bookmark {
@@ -75,7 +75,7 @@ model Bookmark {
   timeMs     Int
   createdAt  DateTime @default(now())
   @@map("talktome_bookmarks")
-  @@schema("safehouse")
+  @@schema("public")
 }
 
 model ImportJob {
@@ -89,5 +89,5 @@ model ImportJob {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
   @@map("talktome_import_jobs")
-  @@schema("safehouse")
+  @@schema("public")
 }
