@@ -9,6 +9,7 @@ import EditTranscriptClient from './EditTranscriptClient';
 import TtsPlayClient from './TtsPlayClient';
 import RotatingStyleText from '@/components/RotatingStyleText';
 import SummaryGeneratorClient from './SummaryGeneratorClient';
+import { HeartIcon } from '@heroicons/react/24/solid';
 
 
 async function clearAction(formData: FormData) {
@@ -63,7 +64,12 @@ export default async function MeetingPage({ params }: { params: Promise<{ id: st
 						<TtsPlayClient text={meeting.summary} />
 					</>
 				) : (
-					<div className="p-3 min-h-[100px] text-center">Talk To Me, hit record and talk! Or type, save edits and hit TalkToMe</div>
+					<div className="p-3 min-h-[100px] text-center flex flex-col items-center justify-center">
+						<div className="flex items-center gap-2 text-2xl font-medium text-gray-700">
+							<span>Vibed with Love</span>
+							<HeartIcon className="h-8 w-8 text-red-500" />
+						</div>
+					</div>
 				)}
 				{meeting.summary && (
 					<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
