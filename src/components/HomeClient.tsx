@@ -45,9 +45,9 @@ export default function HomeClient({ folders, meetings, createFolder, createMeet
               <li key={f.id} className="p-3 flex items-center justify-between gap-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.5)' }}>
                 <button
                   onClick={() => setSelectedFolderId(f.id)}
-                  className={`font-medium text-left flex-1 p-2 rounded transition-colors ${
+                  className={`cursor-pointer font-medium text-left flex-1 p-2 rounded transition-colors ${
                     selectedFolderId === f.id 
-                      ? 'bg-blue-500 text-white' 
+                      ? 'bg-[#8a5df6] text-white' 
                       : 'hover:bg-white/20'
                   }`}
                 >
@@ -104,7 +104,7 @@ export default function HomeClient({ folders, meetings, createFolder, createMeet
                       <p className="font-medium">{m.title}</p>
                       <p className="text-sm text-gray-300"><ClientTime iso={m.createdAt as unknown as string} /></p>
                       {m.folderId && (
-                        <p className="text-xs text-blue-600 font-medium mt-1">
+                        <p className="text-xs text-gray-800 font-medium mt-1">
                           📁 {folderMap.get(m.folderId)}
                         </p>
                       )}

@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function EditTranscriptClient({ meetingId, initial }: { meetingId: string; initial: string }) {
 	const [text, setText] = useState<string>(initial ?? "");
@@ -7,6 +8,7 @@ export default function EditTranscriptClient({ meetingId, initial }: { meetingId
 	// Keep history fetched to record server-side change tracking, not rendered currently
 	const [edits, setEdits] = useState<Array<{ id: string; fromText: string; toText: string; createdAt: string }>>([]);
 	const [dirty, setDirty] = useState(false);
+	const router = useRouter();
 
 	async function save() {
 		setSaving(true);
@@ -19,6 +21,8 @@ export default function EditTranscriptClient({ meetingId, initial }: { meetingId
 		if (!res.ok) return;
 		await loadHistory();
 		setDirty(false);
+		// Refresh the page to update the summary generator visibility
+		router.refresh();
 	}
 
 	async function loadHistory() {
