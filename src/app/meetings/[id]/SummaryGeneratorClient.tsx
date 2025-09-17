@@ -46,7 +46,7 @@ export default function SummaryGeneratorClient({ meetingId, hasTranscript, hasSu
     <form action={handleGenerate} className="flex flex-col gap-2 justify-start mt-2">
       <div className="flex flex-col gap-1">
         <label htmlFor="style" className="text-sm text-white italic">In the style of: </label>
-        <select name="style" id="style" className="rounded px-2 py-1 text-white" style={{ border: '1px solid rgba(255,255,255,0.5)' }}>
+        <select name="style" id="style" className="rounded p-2 text-white" style={{ border: '1px solid rgba(255,255,255,0.5)' }}>
           <option value="">Default</option>
           <option>Meeting Notes</option>
           <option>Rapper – Punchy rhyme or a hype bar.</option>
