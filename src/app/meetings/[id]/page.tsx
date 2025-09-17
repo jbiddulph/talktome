@@ -65,9 +65,9 @@ export default async function MeetingPage({ params }: { params: Promise<{ id: st
 					</>
 				) : (
 					<div className="p-3 min-h-[100px] text-center flex flex-col items-center justify-center">
-						<div className="flex items-center gap-2 text-2xl font-medium text-gray-700">
+						<div className="flex items-center gap-2 text-xs font-medium text-gray-700">
 							<span>Vibed with Love</span>
-							<HeartIcon className="h-8 w-8 text-red-500" />
+							<HeartIcon className="h-8 w-8 text-red-600" />
 						</div>
 					</div>
 				)}
