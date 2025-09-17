@@ -11,6 +11,7 @@ export default function ConfirmButton({ children, className, confirmText }: Prop
 			onClick={(e) => {
 				if (!confirm(confirmText)) e.preventDefault();
 			}}
+			style={{ border: '1px solid rgba(255,255,255,0.5)' }}
 		>
 			{children}
 		</button>

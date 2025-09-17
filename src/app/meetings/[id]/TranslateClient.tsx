@@ -40,9 +40,10 @@ export default function TranslateClient({ text }: { text: string }) {
           <button
             key={l.code}
             onClick={() => translate(l.code)}
-            className="border rounded px-2 py-1"
+            className="px-2 py-1 text-white"
             disabled={!!loading}
             title={`Translate to ${l.label}`}
+            style={{ border: '1px solid rgba(255,255,255,0.5)', borderRadius: '8px' }}
           >
             <span className="text-xl mr-1">{l.flag}</span>
             <span className="text-sm">{l.label}</span>

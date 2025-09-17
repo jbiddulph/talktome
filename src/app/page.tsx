@@ -131,11 +131,11 @@ export default async function Home() {
         <ul id="recordings" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           {meetings.map((m) => (
             <li key={m.id} className="group">
-              <Link href={`/meetings/${m.id}`} className="block border rounded p-3 space-y-2 bg-white/60 backdrop-blur-sm hover:shadow-sm transition-shadow cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-400">
+              <Link href={`/meetings/${m.id}`} className="btn-primary block border rounded p-3 space-y-2 bg-white/60 backdrop-blur-sm hover:shadow-sm transition-shadow cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-400">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="font-medium">{m.title}</p>
-                    <p className="text-sm text-gray-500"><ClientTime iso={m.createdAt as unknown as string} /></p>
+                    <p className="text-sm text-gray-300"><ClientTime iso={m.createdAt as unknown as string} /></p>
                   </div>
                 </div>
               </Link>

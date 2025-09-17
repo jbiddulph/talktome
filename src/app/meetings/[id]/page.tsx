@@ -42,7 +42,7 @@ export default async function MeetingPage({ params }: { params: Promise<{ id: st
 		<main className="max-w-3xl mx-auto p-6 space-y-6">
 			{/* Instruction full-width centered under top bar */}
 			<div>
-				<p className="text-2xl text-center mt-2 text-gray-700">Hit record, talk away, read or hear it back<br /> in the style of a <strong><RotatingStyleText /></strong></p>
+				<p className="text-3xl text-center mt-2 text-gray-700">Hit record, talk away, read or hear it back<br /> in the style of a <strong><RotatingStyleText /></strong></p>
 			</div>
 
 			<section className="space-y-3">
@@ -56,8 +56,8 @@ export default async function MeetingPage({ params }: { params: Promise<{ id: st
 				{(meeting.transcript && meeting.transcript.length > 0) && (
 					<form action={summarizeAction} className="flex flex-col gap-2 justify-start mt-2">
 						<div className="flex flex-col gap-1">
-							<label htmlFor="style" className="text-sm text-gray-700">In the style of</label>
-						<select name="style" id="style" className="rounded px-2 py-1" style={{ border: '1px solid rgba(255,255,255,0.5)' }}>
+							<label htmlFor="style" className="text-sm text-white italic">In the style of: </label>
+							<select name="style" id="style" className="rounded px-2 py-1 text-white" style={{ border: '1px solid rgba(255,255,255,0.5)' }}>
 								<option value="">Default</option>
 								<option>Meeting Notes</option>
 								<option>Rapper – Punchy rhyme or a hype bar.</option>
@@ -91,7 +91,7 @@ export default async function MeetingPage({ params }: { params: Promise<{ id: st
 					{(meeting.transcript && meeting.transcript.length > 0) && (
 						<form action={clearAction}>
 							<input type="hidden" name="meetingId" value={meeting.id} />
-							<ConfirmButton confirmText="Clear transcript and summary?" className="px-2 py-1 text-xs rounded border bg-white/70 backdrop-blur-sm">✕ Clear</ConfirmButton>
+							<ConfirmButton confirmText="Clear transcript and summary?" className="btn-primary px-2 py-1 text-xs rounded border bg-white/70 backdrop-blur-sm">✕ Clear</ConfirmButton>
 						</form>
 					)}
 				</div>

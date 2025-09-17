@@ -23,7 +23,6 @@ export default function ShareActions({ title, summary }: Props) {
 			<button onClick={shareNative} className="px-3 py-2 rounded bg-sky-600 text-white">Share</button>
 			<a href={smsHref} className="px-3 py-2 rounded bg-emerald-600 text-white" target="_blank" rel="noreferrer">SMS</a>
 			<a href={whatsappHref} className="px-3 py-2 rounded bg-green-600 text-white" target="_blank" rel="noreferrer">WhatsApp</a>
-			<a href={twitterHref} className="px-3 py-2 rounded bg-blue-700 text-white" target="_blank" rel="noreferrer">Social</a>
 		</div>
 	);
 }

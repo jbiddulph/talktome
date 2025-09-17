@@ -40,10 +40,11 @@ export default function EditTranscriptClient({ meetingId, initial }: { meetingId
 	return (
 		<div className="space-y-2">
 			<textarea
-				className="w-full border rounded p-3 min-h-[160px] bg-half-white text-gray-900"
+				className="w-full border rounded p-3 min-h-[160px] bg-half-white text-gray-900 text-xl"
 				value={text}
 				onChange={(e) => setText(e.target.value)}
 				placeholder="Edit transcript..."
+				style={{ border: '4px solid rgba(255,255,255,0.4)', borderRadius: '12px' }}
 			/>
 			<div className="flex items-center justify-start gap-2">
 				{dirty && (

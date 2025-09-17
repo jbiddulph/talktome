@@ -13,7 +13,7 @@ export default function CopyableBlock({ text, className }: Props) {
 		} catch {}
 	}
 	return (
-		<div onClick={copy} className={className} title={copied ? 'Copied!' : 'Click to copy'}>
+		<div onClick={copy} className={className} title={copied ? 'Copied!' : 'Click to copy'}  style={{ border: '1px solid rgba(255,255,255,0.5)', borderRadius: '12px' }}>
 			<div className="flex items-center justify-between mb-2">
 				<span className="text-xs text-gray-500">Click to copy</span>
 				{copied && <span className="text-xs text-emerald-600">Copied</span>}

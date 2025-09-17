@@ -32,7 +32,7 @@ export default function RootLayout({
             <HeaderNavClient />
           </header>
           <main className="m-4" style={{ paddingTop: 8, paddingBottom: 8 }}>{children}</main>
-          <footer className="glass" style={{ margin: '12px', padding: '10px 16px', fontSize: 12, borderRadius: 12 }}>
+          <footer className="glass" style={{ margin: '12px', textAlign: 'center', padding: '10px 16px', fontSize: 12, borderRadius: 12 }}>
             <span>© {new Date().getFullYear()} TalkToMe</span>
           </footer>
         </div>

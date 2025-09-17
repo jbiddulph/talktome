@@ -78,8 +78,8 @@ export default function TtsPlayClient({ text, style }: { text: string; style?: s
     }
 
     return (
-        <div className="flex items-center gap-2">
-            <button type="button" className="btn-ghost" onClick={onPlayPause} disabled={isLoading}>
+        <div className="flex items-center gap-2 w-100">
+            <button type="button" className="btn-primary" onClick={onPlayPause} disabled={isLoading}>
                 {isLoading ? (
                     <span className="inline-flex items-center gap-1">
                         <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
@@ -90,7 +90,7 @@ export default function TtsPlayClient({ text, style }: { text: string; style?: s
                     </span>
                 ) : isPlaying ? '⏸ Pause' : hasAudio ? '▶️ Play' : '🔊 Play'}
             </button>
-            <button type="button" className="btn-ghost" onClick={onStop} disabled={!hasAudio || isLoading}>
+            <button type="button" className="btn-primary" onClick={onStop} disabled={!hasAudio || isLoading}>
                 ⏹ Stop
             </button>
             {error && <span className="text-xs text-red-600">{error}</span>}
