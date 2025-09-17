@@ -6,11 +6,14 @@ import { PlusIcon, FolderIcon, PencilIcon, TrashIcon } from '@heroicons/react/24
 import ClientTime from '@/components/ClientTime';
 import ConfirmButton from '@/components/ConfirmButton';
 
+type FolderLite = { id: string; name: string };
+type MeetingLite = { id: string; title: string; folderId: string | null; createdAt: Date };
+
 export default async function Home() {
-  const [folders, meetings] = await Promise.all([
+  const [folders, meetings] = (await Promise.all([
     prisma.folder.findMany({ orderBy: { createdAt: 'desc' } }),
     prisma.meeting.findMany({ orderBy: { createdAt: 'desc' } }),
-  ]);
+  ])) as [FolderLite[], MeetingLite[]];
 
   async function createFolder(formData: FormData) {
     'use server';
@@ -75,7 +78,7 @@ export default async function Home() {
         <h1 className="text-2xl font-semibold flex items-center gap-2">
           <FolderIcon className="h-6 w-6 text-blue-600" /> TalkToMe
         </h1>
-        <p className="opacity-90">Capture, transcribe, and summarize meetings.</p>
+        <p className="opacity-90">Capture, transcribe, and summarize.</p>
       </div>
 
       <section className="space-y-2 glass p-4" style={{ borderRadius: 12 }}>
@@ -103,7 +106,7 @@ export default async function Home() {
                 </details>
                 <form action={deleteFolder}>
                   <input type="hidden" name="id" value={f.id} />
-                  <ConfirmButton confirmText="Delete this folder and all meetings?" className="text-red-700 inline-flex items-center gap-1"><TrashIcon className="h-4 w-4" /> Delete</ConfirmButton>
+                  <ConfirmButton confirmText="Delete this folder and all recordings?" className="text-red-700 inline-flex items-center gap-1"><TrashIcon className="h-4 w-4" /> Delete</ConfirmButton>
                 </form>
               </div>
             </li>
@@ -112,9 +115,9 @@ export default async function Home() {
       </section>
 
       <section className="space-y-2 glass p-4" style={{ borderRadius: 12 }}>
-        <h2 className="text-xl font-medium">Meetings</h2>
+        <h2 className="text-xl font-medium">Recordings</h2>
         <form action={createMeeting} className="flex gap-2">
-          <input name="title" placeholder="New meeting title" className="border rounded px-3 py-3 flex-1" />
+          <input name="title" placeholder="New recording title" className="border rounded px-3 py-3 flex-1" />
           <select name="folderId" className="border rounded px-3 py-3">
             <option value="">No folder</option>
             {folders.map((f) => (
@@ -149,7 +152,7 @@ export default async function Home() {
                   </details>
                   <form action={deleteMeeting}>
                     <input type="hidden" name="id" value={m.id} />
-                    <ConfirmButton confirmText="Delete this meeting?" className="text-red-700 inline-flex items-center gap-1"><TrashIcon className="h-4 w-4" /> Delete</ConfirmButton>
+                    <ConfirmButton confirmText="Delete this recording?" className="text-red-700 inline-flex items-center gap-1"><TrashIcon className="h-4 w-4" /> Delete</ConfirmButton>
                   </form>
                 </div>
               </div>
