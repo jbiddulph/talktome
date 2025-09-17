@@ -16,7 +16,7 @@ export async function transcribeAudio(file: File | Blob): Promise<string> {
 	return String(data.text ?? '');
 }
 
-export async function summarizeTranscript(transcript: string): Promise<string> {
+export async function summarizeTranscript(transcript: string, style?: string): Promise<string> {
 	const apiKey = process.env.OPENAI_API_KEY || process.env.OPEN_AI_KEY;
 	if (!apiKey) throw new Error('OPENAI_API_KEY not set');
 
@@ -26,15 +26,18 @@ export async function summarizeTranscript(transcript: string): Promise<string> {
 			'Content-Type': 'application/json',
 			Authorization: `Bearer ${apiKey}`,
 		},
-		body: JSON.stringify({
+    body: JSON.stringify({
 			model: 'gpt-4o-mini',
 			messages: [
-				{ role: 'system', content: 'You are an assistant that writes concise meeting summaries.' },
+                { role: 'system', content: 'You are an assistant that writes concise meeting summaries.' },
 				{
 					role: 'user',
-					content:
-						'Summarize the following meeting transcript in 5-8 bullet points with action items and decisions. Transcript: ' +
-						transcript,
+                    content: (
+                        (style && style.trim().length > 0
+                            ? `Summarize the following transcript in 5-8 bullet points with action items and decisions, written in the style of: ${style}. Keep it readable and faithful to the content.\n\nTranscript: `
+                            : 'Summarize the following meeting transcript in 5-8 bullet points with action items and decisions. Transcript: '
+                        ) + transcript
+                    ),
 				},
 			],
 			temperature: 0.2,

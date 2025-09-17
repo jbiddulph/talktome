@@ -17,7 +17,8 @@ async function summarizeAction(formData: FormData) {
 	if (!meetingId) return;
 	const meeting = await prisma.meeting.findUnique({ where: { id: meetingId } });
 	if (!meeting?.transcript) return;
-	const summary = await summarizeTranscript(meeting.transcript);
+	const style = String(formData.get('style') ?? '').trim();
+	const summary = await summarizeTranscript(meeting.transcript, style || undefined);
 	await prisma.meeting.update({ where: { id: meetingId }, data: { summary } });
 	revalidatePath(`/meetings/${meetingId}`);
 }
@@ -61,7 +62,31 @@ export default async function MeetingPage({ params }: { params: Promise<{ id: st
 					)}
 				</div>
 				{(meeting.transcript && meeting.transcript.length > 0) && (
-					<form action={summarizeAction} className="flex justify-start mt-2">
+					<form action={summarizeAction} className="flex flex-col gap-2 justify-start mt-2">
+						<div className="flex items-center gap-2">
+							<label htmlFor="style" className="text-sm text-gray-700">In the style of</label>
+							<select name="style" id="style" className="border rounded px-2 py-1">
+								<option value="">Default</option>
+								<option>Meeting Notes</option>
+								<option>Rapper – Punchy rhyme or a hype bar.</option>
+								<option>Sports Commentator – Calls it like a thrilling play-by-play moment.</option>
+								<option>Movie Trailer Voice – Over-the-top and cinematic.</option>
+								<option>News Anchor – Formal, and breaking-news style.</option>
+								<option>Stand-Up Comedian – Twists it into a witty punchline.</option>
+								<option>Shakespearean Bard – Flowery, old-English phrasing.</option>
+								<option>Fairy Tale Narrator – Whimsical and magical.</option>
+								<option>Conspiracy Theorist – Paranoid and full of hidden meanings.</option>
+								<option>Tech Support Agent – Dry and procedural.</option>
+								<option>Pet Blogger – As if your dog or cat is gossiping about you.</option>
+								<option>Cooking Show Host – Ingredients and steps as a recipe.</option>
+								<option>Pirate Captain – Growly and full of “Arrr!”</option>
+								<option>Poet – Turns it into a haiku or rhyming couplet.</option>
+								<option>Gamer Streamer – Overly excited Twitch energy.</option>
+								<option>Motivational Coach – Pep talk style, big on energy.</option>
+								<option>Sci-Fi Narrator – Futuristic and dramatic, with starship vibes.</option>
+								<option>Gossip Columnist – Sassy and dramatic, spilling “tea”.</option>
+							</select>
+						</div>
 						<input type="hidden" name="meetingId" value={meeting.id} />
 						<SubmitButton className="btn-primary" idleText="Generate Summary" pendingText="Generating..." />
 					</form>
