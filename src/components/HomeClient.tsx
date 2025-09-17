@@ -68,9 +68,8 @@ export default function HomeClient({ folders, meetings, createFolder, createMeet
         <section className="space-y-3 glass p-4 md:col-span-4" style={{ borderRadius: 12 }}>
           <div className="mb-2">
             <h1 className="text-2xl font-semibold flex items-center gap-2">
-              TalkToMe
+              TalkToMe <span className="opacity-90 text-xs">Capture, transcribe, and TalkToMe.</span>
             </h1>
-            <p className="opacity-90">Capture, transcribe, and summarize.</p>
           </div>
           
           {/* Filter status and clear button */}
