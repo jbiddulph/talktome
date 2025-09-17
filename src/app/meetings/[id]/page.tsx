@@ -45,7 +45,7 @@ export default async function MeetingPage({ params }: { params: Promise<{ id: st
 					<div>
 						<h1 className="text-2xl font-semibold">{meeting.title}</h1>
 						<p className="text-sm text-gray-500"><ClientTime iso={meeting.createdAt as unknown as string} /></p>
-						<p className="text-sm text-gray-700 mt-2">Hit record and talk away and hear it back in the style of a <RotatingStyleText />.</p>
+						<p className="text-lg text-yellow-500 mt-2">Hit record and talk away and hear or read it back<br /> in the style of a <strong><RotatingStyleText /></strong>.</p>
 					</div>
 				</div>
 				<div className="inline-flex items-center gap-2" />
