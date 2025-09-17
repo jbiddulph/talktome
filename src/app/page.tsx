@@ -28,9 +28,9 @@ export default async function Home() {
     'use server';
     const title = String(formData.get('title') ?? 'Untitled Meeting');
     const folderId = String(formData.get('folderId') ?? '');
-    await prisma.meeting.create({ data: { title, folderId: folderId || null } });
+    const meeting = await prisma.meeting.create({ data: { title, folderId: folderId || null } });
     revalidatePath('/');
-    redirect('/');
+    redirect(`/talktome/${meeting.id}`);
   }
 
   async function updateFolder(formData: FormData) {

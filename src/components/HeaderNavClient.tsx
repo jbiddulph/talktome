@@ -8,7 +8,7 @@ type MeetingHeader = { title: string; createdAt: string } | null;
 
 export default function HeaderNavClient() {
     const pathname = usePathname();
-    const onMeeting = pathname?.startsWith('/meetings/');
+    const onMeeting = pathname?.startsWith('/talktome/');
     const [meeting, setMeeting] = useState<MeetingHeader>(null);
 
     useEffect(() => {

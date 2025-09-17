@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
       data: { summary } 
     });
     
-    revalidatePath(`/meetings/${meetingId}`);
+    revalidatePath(`/talktome/${meetingId}`);
     
     return new Response(JSON.stringify({ success: true }), {
       status: 200,

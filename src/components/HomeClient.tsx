@@ -98,7 +98,7 @@ export default function HomeClient({ folders, meetings, createFolder, createMeet
           <ul id="recordings" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {filteredMeetings.map((m) => (
               <li key={m.id} className="group">
-                <Link href={`/meetings/${m.id}`} className="btn-primary block border rounded p-3 space-y-2 bg-white/60 backdrop-blur-sm hover:shadow-sm transition-shadow cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-400">
+                <Link href={`/talktome/${m.id}`} className="btn-primary block border rounded p-3 space-y-2 bg-white/60 backdrop-blur-sm hover:shadow-sm transition-shadow cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-400">
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
                       <p className="font-medium">{m.title}</p>

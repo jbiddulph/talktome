@@ -17,7 +17,7 @@ async function clearAction(formData: FormData) {
 	const meetingId = String(formData.get('meetingId') ?? '');
 	if (!meetingId) return;
 	await prisma.meeting.update({ where: { id: meetingId }, data: { transcript: null, summary: null } });
-	revalidatePath(`/meetings/${meetingId}`);
+	revalidatePath(`/talktome/${meetingId}`);
 }
 
 export default async function MeetingPage({ params }: { params: Promise<{ id: string }> }) {
