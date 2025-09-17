@@ -26,11 +26,17 @@ export default async function Home() {
 
   async function createMeeting(formData: FormData) {
     'use server';
-    const title = String(formData.get('title') ?? 'Untitled Meeting');
-    const folderId = String(formData.get('folderId') ?? '');
-    const meeting = await prisma.meeting.create({ data: { title, folderId: folderId || null } });
-    revalidatePath('/');
-    redirect(`/talktome/${meeting.id}`);
+    try {
+      const title = String(formData.get('title') ?? 'Untitled Meeting');
+      const folderId = String(formData.get('folderId') ?? '');
+      const meeting = await prisma.meeting.create({ data: { title, folderId: folderId || null } });
+      revalidatePath('/');
+      redirect(`/talktome/${meeting.id}`);
+    } catch (error) {
+      console.error('Error creating meeting:', error);
+      revalidatePath('/');
+      redirect('/');
+    }
   }
 
   async function updateFolder(formData: FormData) {

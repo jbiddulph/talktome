@@ -20,6 +20,12 @@ export default function HomeClient({ folders, meetings, createFolder, createMeet
   // Create a map of folder names for quick lookup
   const folderMap = new Map(folders.map(f => [f.id, f.name]));
 
+  // Function to truncate long titles
+  const truncateTitle = (title: string, maxLength: number = 23) => {
+    if (title.length <= maxLength) return title;
+    return title.substring(0, maxLength) + '...';
+  };
+
   // Filter meetings based on selected folder
   const filteredMeetings = selectedFolderId 
     ? meetings.filter(m => m.folderId === selectedFolderId)
@@ -85,7 +91,7 @@ export default function HomeClient({ folders, meetings, createFolder, createMeet
 
           <h2 className="text-xl font-medium">To get started, add a title, select a folder and click Create.</h2>
           <form action={createMeeting} className="flex gap-2">
-            <input name="title" placeholder="New recording title" className="border-primaryrounded px-3 py-3 flex-1" style={{ border: '3px solid rgba(255,255,255,0.6)', borderRadius: 8 }} />
+            <input name="title" placeholder="New TalkToMe title" maxLength={100} className="border-primaryrounded px-3 py-3 flex-1" style={{ border: '3px solid rgba(255,255,255,0.6)', borderRadius: 8 }} />
             <select name="folderId" className="rounded px-3 py-3" style={{ border: '3px solid rgba(255,255,255,0.6)', borderRadius: 8 }}>
               <option value="">No folder</option>
               {folders.map((f) => (
@@ -101,7 +107,7 @@ export default function HomeClient({ folders, meetings, createFolder, createMeet
                 <Link href={`/talktome/${m.id}`} className="btn-primary block border rounded p-3 space-y-2 bg-white/60 backdrop-blur-sm hover:shadow-sm transition-shadow cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-400">
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
-                      <p className="font-medium">{m.title}</p>
+                      <p className="font-medium" title={m.title}>{truncateTitle(m.title)}</p>
                       <p className="text-sm text-gray-300"><ClientTime iso={m.createdAt as unknown as string} /></p>
                       {m.folderId && (
                         <p className="text-xs text-gray-800 font-medium mt-1">
