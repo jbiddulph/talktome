@@ -52,18 +52,20 @@ export default async function MeetingPage({ params }: { params: Promise<{ id: st
 				<div className="flex justify-center -mt-2 mb-2">
 					<RecorderClient meetingId={meeting.id} />
 				</div>
-				<div className="relative">
-					<EditTranscriptClient meetingId={meeting.id} initial={meeting.transcript ?? ''} />
-					{(meeting.transcript && meeting.transcript.length > 0) && (
-						<form action={clearAction} className="absolute right-2 top-2">
+				{(meeting.transcript && meeting.transcript.length > 0) && (
+					<div className="flex justify-end">
+						<form action={clearAction}>
 							<input type="hidden" name="meetingId" value={meeting.id} />
 							<ConfirmButton confirmText="Clear transcript and summary?" className="px-2 py-1 text-xs rounded border bg-white/70 backdrop-blur-sm">✕ Clear</ConfirmButton>
 						</form>
-					)}
+					</div>
+				)}
+				<div className="relative">
+					<EditTranscriptClient meetingId={meeting.id} initial={meeting.transcript ?? ''} />
 				</div>
 				{(meeting.transcript && meeting.transcript.length > 0) && (
 					<form action={summarizeAction} className="flex flex-col gap-2 justify-start mt-2">
-						<div className="flex items-center gap-2">
+						<div className="flex flex-col gap-1">
 							<label htmlFor="style" className="text-sm text-gray-700">In the style of</label>
 							<select name="style" id="style" className="border rounded px-2 py-1">
 								<option value="">Default</option>
