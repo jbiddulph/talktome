@@ -197,12 +197,12 @@ export default function Recorder({ meetingId }: Props) {
   return (
     <div className="flex items-center gap-4">
       {!recording ? (
-        <button onClick={start} className="relative inline-flex items-center justify-center h-14 w-14 rounded-full text-white shadow-lg active:scale-95 transition-transform focus:outline-none focus:ring-2 focus:ring-red-400" style={{ background: 'radial-gradient(100% 100% at 50% 0%, #ef4444 0%, #b91c1c 100%)' }} aria-label="Start recording">
-          <MicrophoneIcon className="h-7 w-7" />
+        <button onClick={start} className="relative inline-flex items-center justify-center h-12 w-12 rounded-full text-white shadow-lg active:scale-95 transition-transform focus:outline-none focus:ring-2 focus:ring-red-400" style={{ background: 'radial-gradient(100% 100% at 50% 0%, #ef4444 0%, #b91c1c 100%)' }} aria-label="Start recording">
+          <MicrophoneIcon className="h-6 w-6" />
         </button>
       ) : (
-        <button onClick={stop} className="relative inline-flex items-center justify-center h-14 w-14 rounded-full text-white bg-gray-800 shadow-lg active:scale-95 transition-transform focus:outline-none focus:ring-2 focus:ring-gray-400" aria-label="Stop recording">
-          <StopCircleIcon className="h-8 w-8 text-red-400" />
+        <button onClick={stop} className="relative inline-flex items-center justify-center h-12 w-12 rounded-full text-white bg-gray-800 shadow-lg active:scale-95 transition-transform focus:outline-none focus:ring-2 focus:ring-gray-400" aria-label="Stop recording">
+          <StopCircleIcon className="h-7 w-7 text-red-400" />
         </button>
       )}
       <div className="flex flex-col gap-1">

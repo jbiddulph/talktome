@@ -45,7 +45,7 @@ export default async function MeetingPage({ params }: { params: Promise<{ id: st
 					<div>
 						<h1 className="text-2xl font-semibold">{meeting.title}</h1>
 						<p className="text-sm text-gray-500"><ClientTime iso={meeting.createdAt as unknown as string} /></p>
-						<p className="text-lg text-yellow-500 mt-2">Hit record and talk away and hear or read it back<br /> in the style of a <strong><RotatingStyleText /></strong>.</p>
+						<p className="text-lg text-center mt-2" style={{ color: '#5b21b6' }}>Hit record and talk away and hear or read it back<br /> in the style of a <strong><RotatingStyleText /></strong></p>
 					</div>
 				</div>
 				<div className="inline-flex items-center gap-2" />
@@ -60,10 +60,11 @@ export default async function MeetingPage({ params }: { params: Promise<{ id: st
 						</form>
 					</div>
 				)}
+				{/* Recorder sits above and to the left of the transcript area */}
+				<div className="flex items-center justify-start">
+					<RecorderClient meetingId={meeting.id} />
+				</div>
 				<div className="relative">
-					<div className="absolute left-2 top-2 z-10">
-						<RecorderClient meetingId={meeting.id} />
-					</div>
 					<EditTranscriptClient meetingId={meeting.id} initial={meeting.transcript ?? ''} />
 				</div>
 				{(meeting.transcript && meeting.transcript.length > 0) && (
