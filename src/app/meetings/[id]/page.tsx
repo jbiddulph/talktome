@@ -11,6 +11,7 @@ import ClientTime from '@/components/ClientTime';
 import CopyableBlock from '@/components/CopyableBlock';
 import EditTranscriptClient from './EditTranscriptClient';
 import TtsPlayClient from './TtsPlayClient';
+import RotatingStyleText from '@/components/RotatingStyleText';
 
 async function summarizeAction(formData: FormData) {
 	'use server';
@@ -44,15 +45,13 @@ export default async function MeetingPage({ params }: { params: Promise<{ id: st
 					<div>
 						<h1 className="text-2xl font-semibold">{meeting.title}</h1>
 						<p className="text-sm text-gray-500"><ClientTime iso={meeting.createdAt as unknown as string} /></p>
+						<p className="text-sm text-gray-700 mt-2">Hit record and talk away and hear it back in the style of a <RotatingStyleText />.</p>
 					</div>
 				</div>
 				<div className="inline-flex items-center gap-2" />
 			</div>
 
 			<section className="space-y-3">
-				<div className="flex justify-center -mt-2 mb-2">
-					<RecorderClient meetingId={meeting.id} />
-				</div>
 				{(meeting.transcript && meeting.transcript.length > 0) && (
 					<div className="flex justify-end">
 						<form action={clearAction}>
@@ -62,6 +61,9 @@ export default async function MeetingPage({ params }: { params: Promise<{ id: st
 					</div>
 				)}
 				<div className="relative">
+					<div className="absolute left-2 top-2 z-10">
+						<RecorderClient meetingId={meeting.id} />
+					</div>
 					<EditTranscriptClient meetingId={meeting.id} initial={meeting.transcript ?? ''} />
 				</div>
 				{(meeting.transcript && meeting.transcript.length > 0) && (
