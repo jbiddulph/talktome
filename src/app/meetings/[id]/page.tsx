@@ -42,18 +42,10 @@ export default async function MeetingPage({ params }: { params: Promise<{ id: st
 		<main className="max-w-3xl mx-auto p-6 space-y-6">
 			{/* Instruction full-width centered under top bar */}
 			<div>
-				<p className="text-xl text-center mt-2 text-gray-700">Hit record and talk away and hear or read it back<br /> in the style of a <strong><RotatingStyleText /></strong></p>
+				<p className="text-2xl text-center mt-2 text-gray-700">Hit record, talk away, read or hear it back<br /> in the style of a <strong><RotatingStyleText /></strong></p>
 			</div>
 
 			<section className="space-y-3">
-				{(meeting.transcript && meeting.transcript.length > 0) && (
-					<div className="flex justify-end">
-						<form action={clearAction}>
-							<input type="hidden" name="meetingId" value={meeting.id} />
-							<ConfirmButton confirmText="Clear transcript and summary?" className="px-2 py-1 text-xs rounded border bg-white/70 backdrop-blur-sm">✕ Clear</ConfirmButton>
-						</form>
-					</div>
-				)}
 				{/* Recorder sits above and to the left of the transcript area */}
 				<div className="flex items-center justify-start">
 					<RecorderClient meetingId={meeting.id} />
@@ -94,15 +86,23 @@ export default async function MeetingPage({ params }: { params: Promise<{ id: st
 			</section>
 
 			<section className="space-y-3">
-				<h2 className="text-xl font-medium">AI Summary</h2>
+				<div className="flex items-center justify-between">
+					<h2 className="text-xl font-medium">AI Summary</h2>
+					{(meeting.transcript && meeting.transcript.length > 0) && (
+						<form action={clearAction}>
+							<input type="hidden" name="meetingId" value={meeting.id} />
+							<ConfirmButton confirmText="Clear transcript and summary?" className="px-2 py-1 text-xs rounded border bg-white/70 backdrop-blur-sm">✕ Clear</ConfirmButton>
+						</form>
+					)}
+				</div>
 				{meeting.summary ? (
 					<>
-						<CopyableBlock className="border rounded p-3 min-h-[100px]" text={meeting.summary} />
+						<CopyableBlock className="border rounded p-3 min-h-[100px] bg-half-white" text={meeting.summary} />
 						{/* TTS play button */}
 						<TtsPlayClient text={meeting.summary} />
 					</>
 				) : (
-					<div className="border rounded p-3 min-h-[100px] whitespace-pre-wrap">No summary yet.</div>
+					<div className="border rounded p-3 min-h-[100px] whitespace-pre-wrap bg-half-white">No summary yet.</div>
 				)}
 				{meeting.summary && (
 					<div className="space-y-2">
