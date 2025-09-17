@@ -61,6 +61,12 @@ export default function TtsPlayClient({ text, style }: { text: string; style?: s
                 audioRef.current.pause();
                 audioRef.current.currentTime = 0;
             }
+            if (urlRef.current) {
+                URL.revokeObjectURL(urlRef.current);
+                urlRef.current = null;
+            }
+            audioRef.current = null;
+            setHasAudio(false);
             setIsPlaying(false);
         } catch {
             /* noop */
