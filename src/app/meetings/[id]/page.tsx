@@ -10,6 +10,7 @@ import ShareActions from './ShareActions';
 import ClientTime from '@/components/ClientTime';
 import CopyableBlock from '@/components/CopyableBlock';
 import EditTranscriptClient from './EditTranscriptClient';
+import TtsPlayClient from './TtsPlayClient';
 
 async function summarizeAction(formData: FormData) {
 	'use server';
@@ -98,7 +99,11 @@ export default async function MeetingPage({ params }: { params: Promise<{ id: st
 			<section className="space-y-3">
 				<h2 className="text-xl font-medium">AI Summary</h2>
 				{meeting.summary ? (
-					<CopyableBlock className="border rounded p-3 min-h-[100px]" text={meeting.summary} />
+					<>
+						<CopyableBlock className="border rounded p-3 min-h-[100px]" text={meeting.summary} />
+						{/* TTS play button */}
+						<TtsPlayClient text={meeting.summary} />
+					</>
 				) : (
 					<div className="border rounded p-3 min-h-[100px] whitespace-pre-wrap">No summary yet.</div>
 				)}
