@@ -40,15 +40,9 @@ export default async function MeetingPage({ params }: { params: Promise<{ id: st
 
 	return (
 		<main className="max-w-3xl mx-auto p-6 space-y-6">
-			<div className="flex items-center justify-between">
-				<div className="flex items-center gap-3">
-					<div>
-						<h1 className="text-2xl font-semibold">{meeting.title}</h1>
-						<p className="text-sm text-gray-500"><ClientTime iso={meeting.createdAt as unknown as string} /></p>
-						<p className="text-lg text-center mt-2" style={{ color: '#5b21b6' }}>Hit record and talk away and hear or read it back<br /> in the style of a <strong><RotatingStyleText /></strong></p>
-					</div>
-				</div>
-				<div className="inline-flex items-center gap-2" />
+			{/* Instruction full-width centered under top bar */}
+			<div>
+				<p className="text-xl text-center mt-2 text-gray-700">Hit record and talk away and hear or read it back<br /> in the style of a <strong><RotatingStyleText /></strong></p>
 			</div>
 
 			<section className="space-y-3">
