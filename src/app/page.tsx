@@ -79,17 +79,17 @@ export default async function Home() {
         <section className="space-y-2 glass p-4 md:col-span-1" style={{ borderRadius: 12 }}>
         <h2 className="text-xl font-medium">Folders</h2>
         <form action={createFolder} className="flex gap-2 text-sm">
-          <input name="name" placeholder="New folder name" className="border rounded px-2 py-2 flex-1" />
+          <input name="name" placeholder="New folder name" className="rounded px-2 py-2 flex-1" style={{ border: '2px solid rgba(255,255,255,0.6)', borderRadius: 8 }} />
           <button className="btn-primary inline-flex items-center gap-1 tap-target">
             <PlusIcon className="h-5 w-5" />
           </button>
         </form>
-        <ul className="divide-y border rounded">
+        <ul className="divide-y">
           {folders.map((f) => (
-            <li key={f.id} className="p-3 flex items-center justify-between gap-3">
+            <li key={f.id} className="p-3 flex items-center justify-between gap-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.5)' }}>
               <span className="font-medium">{f.name}</span>
               <div className="flex items-center gap-2">
-                <details>
+                {/* <details>
                   <summary className="cursor-pointer text-sm text-gray-700 inline-flex items-center gap-1">
                     <PencilIcon className="h-4 w-4" /> Edit
                   </summary>
@@ -102,7 +102,7 @@ export default async function Home() {
                 <form action={deleteFolder}>
                   <input type="hidden" name="id" value={f.id} />
                   <ConfirmButton confirmText="Delete this folder and all recordings?" className="text-red-700 inline-flex items-center gap-1"><TrashIcon className="h-4 w-4" /> Delete</ConfirmButton>
-                </form>
+                </form> */}
               </div>
             </li>
           ))}
@@ -113,14 +113,14 @@ export default async function Home() {
         <section className="space-y-3 glass p-4 md:col-span-4" style={{ borderRadius: 12 }}>
           <div className="mb-2">
             <h1 className="text-2xl font-semibold flex items-center gap-2">
-              <FolderIcon className="h-6 w-6 text-blue-600" /> TalkToMe
+              TalkToMe
             </h1>
             <p className="opacity-90">Capture, transcribe, and summarize.</p>
           </div>
-          <h2 className="text-xl font-medium">Recordings</h2>
+          <h2 className="text-xl font-medium">To get started, add a title, select a folder and click Create.</h2>
         <form action={createMeeting} className="flex gap-2">
-          <input name="title" placeholder="New recording title" className="rounded px-3 py-3 flex-1" style={{ border: '1px solid rgba(255,255,255,0.5)' }} />
-          <select name="folderId" className="rounded px-3 py-3" style={{ border: '1px solid rgba(255,255,255,0.5)' }}>
+          <input name="title" placeholder="New recording title" className="border-primaryrounded px-3 py-3 flex-1" style={{ border: '3px solid rgba(255,255,255,0.6)', borderRadius: 8 }} />
+          <select name="folderId" className="rounded px-3 py-3" style={{ border: '3px solid rgba(255,255,255,0.6)', borderRadius: 8 }}>
             <option value="">No folder</option>
             {folders.map((f) => (
               <option key={f.id} value={f.id}>{f.name}</option>

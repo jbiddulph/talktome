@@ -80,14 +80,14 @@ export default async function MeetingPage({ params }: { params: Promise<{ id: st
 							</select>
 						</div>
 						<input type="hidden" name="meetingId" value={meeting.id} />
-						<SubmitButton className="btn-primary" idleText="Generate Summary" pendingText="Generating..." />
+						<SubmitButton className="btn-primary" idleText="Talk To Me" pendingText="Generating..." />
 					</form>
 				)}
 			</section>
 
 			<section className="space-y-3">
 				<div className="flex items-center justify-between">
-					<h2 className="text-xl font-medium">AI Summary</h2>
+					<h2 className="text-xl font-medium">&nbsp;</h2>
 					{(meeting.transcript && meeting.transcript.length > 0) && (
 						<form action={clearAction}>
 							<input type="hidden" name="meetingId" value={meeting.id} />
@@ -105,11 +105,15 @@ export default async function MeetingPage({ params }: { params: Promise<{ id: st
 					<div className="border rounded p-3 min-h-[100px] whitespace-pre-wrap bg-half-white">No summary yet.</div>
 				)}
 				{meeting.summary && (
-					<div className="space-y-2">
-						<h3 className="font-medium">Translate Summary</h3>
-						<TranslateClient text={meeting.summary} />
-						<h3 className="font-medium">Share</h3>
-						<ShareActions title={meeting.title} summary={meeting.summary} />
+					<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+						<div>
+							<h3 className="font-medium my-2">Translate Summary</h3>
+							<TranslateClient text={meeting.summary} />
+						</div>
+						<div>
+							<h3 className="font-medium my-2">Share</h3>
+							<ShareActions title={meeting.title} summary={meeting.summary} />
+						</div>
 					</div>
 				)}
 			</section>

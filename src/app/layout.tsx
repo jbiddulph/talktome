@@ -28,7 +28,7 @@ export default function RootLayout({
       <body suppressHydrationWarning className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <div style={{ minHeight: '100vh', display: 'grid', gridTemplateRows: 'auto 1fr auto' }}>
           <header className="glass safe-header" style={{ margin: '12px', padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderRadius: 12 }}>
-            <div style={{ fontWeight: 700 }}>🎤 TalkToMe</div>
+            <div className="mr-4" style={{ fontWeight: 700 }}>TalkToMe</div>
             <HeaderNavClient />
           </header>
           <main className="m-4" style={{ paddingTop: 8, paddingBottom: 8 }}>{children}</main>
