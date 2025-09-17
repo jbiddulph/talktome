@@ -73,15 +73,10 @@ export default async function Home() {
   }
 
   return (
-    <main className="container space-y-6">
-      <div className="glass p-5">
-        <h1 className="text-2xl font-semibold flex items-center gap-2">
-          <FolderIcon className="h-6 w-6 text-blue-600" /> TalkToMe
-        </h1>
-        <p className="opacity-90">Capture, transcribe, and summarize.</p>
-      </div>
-
-      <section className="space-y-2 glass p-4" style={{ borderRadius: 12 }}>
+    <main className="container">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+        {/* Folders: ~20% on desktop */}
+        <section className="space-y-2 glass p-4 md:col-span-1" style={{ borderRadius: 12 }}>
         <h2 className="text-xl font-medium">Folders</h2>
         <form action={createFolder} className="flex gap-2">
           <input name="name" placeholder="New folder name" className="border rounded px-3 py-3 flex-1" />
@@ -112,10 +107,17 @@ export default async function Home() {
             </li>
           ))}
         </ul>
-      </section>
+        </section>
 
-      <section className="space-y-2 glass p-4" style={{ borderRadius: 12 }}>
-        <h2 className="text-xl font-medium">Recordings</h2>
+        {/* Recordings: ~80% on desktop */}
+        <section className="space-y-3 glass p-4 md:col-span-4" style={{ borderRadius: 12 }}>
+          <div className="mb-2">
+            <h1 className="text-2xl font-semibold flex items-center gap-2">
+              <FolderIcon className="h-6 w-6 text-blue-600" /> TalkToMe
+            </h1>
+            <p className="opacity-90">Capture, transcribe, and summarize.</p>
+          </div>
+          <h2 className="text-xl font-medium">Recordings</h2>
         <form action={createMeeting} className="flex gap-2">
           <input name="title" placeholder="New recording title" className="border rounded px-3 py-3 flex-1" />
           <select name="folderId" className="border rounded px-3 py-3">
@@ -159,7 +161,8 @@ export default async function Home() {
             </li>
           ))}
         </ul>
-      </section>
+        </section>
+      </div>
     </main>
   );
 }
